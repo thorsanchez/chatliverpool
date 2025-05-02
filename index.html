@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liverpool FC Chatbot</title>
+</head>
+<body>
+    <h1>Liverpool FC Chatbot</h1>
+    
+    <div>
+        <input type="text" id="query-input" placeholder="Ask about Liverpool FC...">
+        <button id="submit-button">Ask</button>
+    </div>
+    
+    <div id="chat-history">
+        <p><strong>Bot:</strong> Hello! I'm the Liverpool FC chatbot. Ask me anything about Liverpool's 2024/25 season!</p>
+    </div>
+
+    <script>
+        // Get elements from the DOM
+        const queryInput = document.getElementById('query-input');
+        const submitButton = document.getElementById('submit-button');
+        const chatHistory = document.getElementById('chat-history');
+        
+        // Function to send a message to the chatbot
+        async function sendMessage() {
+            const query = queryInput.value.trim();
+            
+            if (!query) {
+                return;
+            }
+            
+            // Add user message to chat history
+            const userMessage = document.createElement('p');
+            userMessage.innerHTML = `<strong>You:</strong> ${query}`;
+            chatHistory.appendChild(userMessage);
+            
+            // Clear input field
+            queryInput.value = '';
+            
+            // Add thinking message
+            const thinkingMessage = document.createElement('p');
+            thinkingMessage.innerHTML = '<strong>Bot:</strong> Thinking...';
+            chatHistory.appendChild(thinkingMessage);
+            
+            try {
+                // Send request to backend
+                const response = await fetch('http://localhost:3000/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Server error');
+                }
+                
+                const data = await response.json();
+                
+                // Remove thinking message
+                chatHistory.removeChild(thinkingMessage);
+                
+                // Add bot response to chat history
+                const botMessage = document.createElement('p');
+                botMessage.innerHTML = `<strong>Bot:</strong> ${data.response}`;
+                chatHistory.appendChild(botMessage);
+                
+                // Scroll to the bottom of chat history
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                
+            } catch (error) {
+                // Remove thinking message
+                chatHistory.removeChild(thinkingMessage);
+                
+                // Add error message
+                const errorMessage = document.createElement('p');
+                errorMessage.innerHTML = '<strong>Bot:</strong> Sorry, I had trouble connecting. Please try again.';
+                chatHistory.appendChild(errorMessage);
+            }
+        }
+        
+        // Event listeners
+        submitButton.addEventListener('click', sendMessage);
+        
+        queryInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

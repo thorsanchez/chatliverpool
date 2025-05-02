@@ -1,0 +1,15 @@
+{
+  "name": "liverpool-fc-chatbot",
+  "version": "1.0.0",
+  "description": "A chatbot that answers questions about Liverpool FC's 2024/25 season",
+  "main": "chatbot.js",
+  "scripts": {
+    "start": "node server-web.js",
+    "cli": "node cli.js"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^2.6.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
